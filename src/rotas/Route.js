@@ -13,7 +13,8 @@ export default function RouteWrapper({
     if(loading){
         return(
         <div>
-        </div>)
+        </div>
+        )
     }
 
     if (!signed && isPrivate){

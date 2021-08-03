@@ -9,6 +9,8 @@ function SignUp() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
+  const { signUp, loadingAuth } = useContext(AuthContext);
+
   function handleSubmit(e){
     e.preventDefault();
     //alert('clicou')
@@ -16,8 +18,6 @@ function SignUp() {
       signUp(email, senha, nome);
     }
   }
-
-  const { signUp } = useContext(AuthContext);
 
     return (
       <div className= "container-center">
@@ -30,7 +30,7 @@ function SignUp() {
             <input type="text" placeholder="Seu nome" value={nome} onChange={ (e)=> setNome(e.target.value) } />
             <input type="text" placeholder="email@email.com" value={email} onChange={ (e)=> setEmail(e.target.value) } />
             <input type="password" placeholder="******" value={senha} onChange={ (e)=> setSenha(e.target.value) }/>
-            <button type="submit">Salvar</button>
+            <button type="submit">{loadingAuth ? 'Carregando...' : 'Salvar'}</button>
           </form>
           <Link to="/"> Ja tenho uma conta </Link>
         </div>
