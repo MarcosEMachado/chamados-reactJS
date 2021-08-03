@@ -9,7 +9,9 @@ export default function Dashboard(){
     return(
         <div>
             <Header/>
-            <h1>PAGINA Dashboard user: {user.nome}</h1>
+            <div className="content">
+                <h1>PAGINA Dashboard user: {user.nome}</h1>
+            </div>
         </div>
     )
 }
