@@ -57,9 +57,9 @@ export default function Profile(){
                        avatarUrl: urlStorage,
                        nome: nome
                    };
+                   toast.success('Dados atualizado com sucesso!');
                    setUser(data);
                    sessionStorage(data);
-                   toast.success('Dados atualizado com sucesso!');
                 }).catch((err)=>{
                     console.log('erro no update com a url da imagem!');
                     console.log(err);
