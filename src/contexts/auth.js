@@ -98,7 +98,9 @@ function AuthProvider ({ children }){
              signUp,
              signOut,
              logar,
-             loadingAuth }}>
+             loadingAuth,
+             storageUser,
+             setUser }}>
             {children}
         </AuthContext.Provider>
     )
