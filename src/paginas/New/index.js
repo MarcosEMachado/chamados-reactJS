@@ -18,6 +18,7 @@ export default function New(){
     const [descricao, setDescricao] = useState('');
     const [loadC, setLoadC] = useState(true);
     const [loadA, setLoadA] = useState(true);
+    const [toDashboard, setToDashboard] = useState(false);
 
     const { user } = useContext(AuthContext);
 
@@ -99,12 +100,12 @@ export default function New(){
             status: status,
             descricao: descricao,
             created: new Date(),
-            userIdCreatd: user.id,
+            userIdCreatd: user.uid,
             updateDt: new Date(),
-            userIdUpdate: user.id
+            userIdUpdate: user.uid
         }).then(()=>{
             toast.success('Chamado criado com sucesso!');
-            return (<Redirect to="/dashboard" />);
+            setToDashboard(true);
         }).catch((err)=>{
             toast.error('Erro ao criar o novo chamado, tente novamente');
             console.log(err);
@@ -125,6 +126,9 @@ export default function New(){
 
     return(
         <div>
+            {toDashboard ? 
+            <Redirect to="/dashboard"/>
+            : <></>}
             <Header/>
             <div className="content">
                 <Title name="Novo chamado">
