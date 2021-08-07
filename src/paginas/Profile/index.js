@@ -38,13 +38,15 @@ export default function Profile(){
         const uploadTask = await firebase.storage()
         .ref(`images/${uid}/${imgAvatar.name}`)
         .put(imgAvatar)
-        .then( async ()=>{
+        .then( async (snapshot)=>{
             toast.success('Foto enviada com sucesso!');
-
+            snapshot.ref.getDownloadURL()
+            .then(async (downloadURL)=> {
+            /*    console.log('File available at', downloadURL);
             await firebase.storage().ref(`images/${uid}`)
             .child(imgAvatar.name).getDownloadURL()
-            .then(async (url)=> {
-                let urlStorage = url;
+            .then(async (url)=> {*/                
+           let urlStorage = downloadURL;
 
                 await firebase.firestore().collection('users')
                 .doc(uid)
@@ -59,7 +61,7 @@ export default function Profile(){
                    };
                    toast.success('Dados atualizado com sucesso!');
                    setUser(data);
-                   sessionStorage(data);
+                   storageUser(data);
                 }).catch((err)=>{
                     console.log('erro no update com a url da imagem!');
                     console.log(err);
@@ -70,7 +72,6 @@ export default function Profile(){
             toast.error('Erro ao fazer o Upload da imagem!');
             console.log(err);
         })
-
     }
 
     async function salvar(e){

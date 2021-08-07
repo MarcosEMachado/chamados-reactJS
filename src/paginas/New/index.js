@@ -6,6 +6,7 @@ import './new.css';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../../contexts/auth';
 import firebase from '../../services/firebaseConnection';
+import { Redirect } from 'react-router-dom';
 
 export default function New(){
 
@@ -15,14 +16,15 @@ export default function New(){
     const [clienteSelect, setClienteSelect] = useState(0);
     const [status, setStatus] = useState('Aberto');
     const [descricao, setDescricao] = useState('');
-    const [load, setLoad] = useState(true);
+    const [loadC, setLoadC] = useState(true);
+    const [loadA, setLoadA] = useState(true);
+    const [toDashboard, setToDashboard] = useState(false);
 
     const { user } = useContext(AuthContext);
 
     useEffect(()=> {
         loadClientes();
         loadAssunto();
-        setLoad(false);
     },[]);
 
     async function loadClientes(){
@@ -40,15 +42,18 @@ export default function New(){
             if(lista.length === 0){
                 toast.error('Nenhuma empresa encontrada');
                 setClientes([ {id: 1, nomeFantasia: 'Cliente'} ]);
+                setLoadC(false);
                 return;
             }
 
             setClientes(lista);
+            setLoadC(false);
 
         }).catch((err)=>{
             console.log(err);
             toast.error('Erro ao buscar os clientes');
             setClientes([ {id: 1, nomeFantasia: 'Cliente'} ]);
+            setLoadC(false);
         });
     }
 
@@ -67,21 +72,44 @@ export default function New(){
             if(lista.length === 0){
                 toast.error('Erro ao buscar os assuntos');
                 setAssuntos([{id: 0, nome: 'NA'}]);
+                setLoadA(false);
                 return; 
             }
 
             setAssuntos(lista);
+            setLoadA(false);
+            
         })
         .catch((err)=>{
             console.log(err);
             toast.error('Erro ao buscar os assuntos');
             setAssuntos([{id: 0, nome: 'NA'}]);
+            setLoadA(false);
         });
 
     }
 
     async function register(e){
-
+        e.preventDefault();
+        await firebase.firestore().collection('chamados')
+        .add({
+            clienteId: clientes[clienteSelect].id,
+            clienteNome: clientes[clienteSelect].nomeFantasia,
+            assuntoId: assuntos[assunto].id,
+            assuntoNome: assuntos[assunto].nome,
+            status: status,
+            descricao: descricao,
+            created: new Date(),
+            userIdCreatd: user.uid,
+            updateDt: new Date(),
+            userIdUpdate: user.uid
+        }).then(()=>{
+            toast.success('Chamado criado com sucesso!');
+            setToDashboard(true);
+        }).catch((err)=>{
+            toast.error('Erro ao criar o novo chamado, tente novamente');
+            console.log(err);
+        })
     }
 
     function changeAssunto(e){
@@ -98,6 +126,9 @@ export default function New(){
 
     return(
         <div>
+            {toDashboard ? 
+            <Redirect to="/dashboard"/>
+            : <></>}
             <Header/>
             <div className="content">
                 <Title name="Novo chamado">
@@ -107,16 +138,24 @@ export default function New(){
                 <div className="container">
                     <form className="form-profile" onSubmit={register}>
                         <label>Cliente</label>
-                        <select value={clienteSelect} onChange={changeCliente} >
-                            { clientes.map((item, index)=>{
-                                return(
-                                    <option key={item.id} value={index}>
-                                        {item.nomeFantasia}
-                                    </option>
-                                );
-                            }) }
-                        </select>
+                        {loadC ? (
+                            <input type="text" disabled={true} value="Por Favor aguarde, carregando..." />
+                        ):(
+                            <select value={clienteSelect} onChange={changeCliente} >
+                                { clientes.map((item, index)=>{
+                                    return(
+                                        <option key={item.id} value={index}>
+                                            {item.nomeFantasia}
+                                        </option>
+                                    );
+                                }) }
+                            </select>
+                        )}
+                        
                         <label>Assunto</label>
+                        {loadA ? (
+                            <input type="text" disabled={true} value="Por Favor aguarde, carregando..." />
+                        ):(
                             <select value={assunto} onChange={changeAssunto}>
                                 { assuntos.map((item, index)=>{
                                     return(
@@ -127,6 +166,7 @@ export default function New(){
                                     );
                                 })}
                             </select>
+                        )}
                         <label>Status</label>
                         <div className="status">
                             <input 
