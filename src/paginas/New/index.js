@@ -6,7 +6,7 @@ import './new.css';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../../contexts/auth';
 import firebase from '../../services/firebaseConnection';
-import { Redirect } from 'react-router-dom';
+import { Redirect, useHistory, useParams } from 'react-router-dom';
 
 export default function New(){
 
@@ -20,74 +20,83 @@ export default function New(){
     const [loadA, setLoadA] = useState(true);
     const [toDashboard, setToDashboard] = useState(false);
 
+    const { id } = useParams();
+    const history = useHistory();
+    const [isUpdate, setIsUpdate] = useState(false);
+
     const { user } = useContext(AuthContext);
 
     useEffect(()=> {
-        loadClientes();
-        loadAssunto();
-    },[]);
-
-    async function loadClientes(){
-        await firebase.firestore().collection('customers')
-        .get()
-        .then((snapshot)=>{
-            let lista = [];
-
-            snapshot.forEach((doc)=> {
-                lista.push({
-                    id: doc.id,
-                    nomeFantasia: doc.data().nomeFantasia
+        async function loadDate(){
+            await firebase.firestore().collection('customers')
+            .get()
+            .then((snapshot)=>{
+                let lista = [];
+    
+                snapshot.forEach((doc)=> {
+                    lista.push({
+                        id: doc.id,
+                        nomeFantasia: doc.data().nomeFantasia
+                    })
                 })
-            })
-            if(lista.length === 0){
-                toast.error('Nenhuma empresa encontrada');
+                if(lista.length === 0){
+                    toast.error('Nenhuma empresa encontrada');
+                    setClientes([ {id: 1, nomeFantasia: 'Cliente'} ]);
+                    setLoadC(false);
+                    return;
+                }
+    
+                setClientes(lista);
+                setLoadC(false);
+    
+                console.log(clientes);
+    
+            }).catch((err)=>{
+                console.log(err);
+                toast.error('Erro ao buscar os clientes');
                 setClientes([ {id: 1, nomeFantasia: 'Cliente'} ]);
                 setLoadC(false);
-                return;
-            }
-
-            setClientes(lista);
-            setLoadC(false);
-
-        }).catch((err)=>{
-            console.log(err);
-            toast.error('Erro ao buscar os clientes');
-            setClientes([ {id: 1, nomeFantasia: 'Cliente'} ]);
-            setLoadC(false);
-        });
-    }
-
-    async function loadAssunto(){
-        await firebase.firestore().collection('assuntos')
-        .get()
-        .then((snapshot)=>{
-            let lista = [];
-
-            snapshot.forEach((doc)=>{
-                lista.push({
-                    id: doc.id,
-                    nome: doc.data().nome
-                });
             });
-            if(lista.length === 0){
+        
+            ///assunto
+            await firebase.firestore().collection('assuntos')
+            .get()
+            .then((snapshot)=>{
+                let lista = [];
+
+                snapshot.forEach((doc)=>{
+                    lista.push({
+                        id: doc.id,
+                        nome: doc.data().nome
+                    });
+                });
+                if(lista.length === 0){
+                    toast.error('Erro ao buscar os assuntos');
+                    setAssuntos([{id: 0, nome: 'NA'}]);
+                    setLoadA(false);
+                    return; 
+                }
+
+                setAssuntos(lista);
+                setLoadA(false);
+                
+            })
+            .catch((err)=>{
+                console.log(err);
                 toast.error('Erro ao buscar os assuntos');
                 setAssuntos([{id: 0, nome: 'NA'}]);
                 setLoadA(false);
-                return; 
-            }
+            });
 
-            setAssuntos(lista);
-            setLoadA(false);
-            
-        })
-        .catch((err)=>{
-            console.log(err);
-            toast.error('Erro ao buscar os assuntos');
-            setAssuntos([{id: 0, nome: 'NA'}]);
-            setLoadA(false);
-        });
+        }
 
-    }
+        loadDate();
+
+        if(id){
+            loadId();
+        }
+
+    },[]);
 
     async function register(e){
         e.preventDefault();
@@ -110,6 +119,25 @@ export default function New(){
             toast.error('Erro ao criar o novo chamado, tente novamente');
             console.log(err);
         })
+    }
+
+    async function loadId(){
+        await firebase.firestore().collection('chamados').doc(id)
+        .get()
+        .then((snapshot)=>{
+            setStatus(snapshot.data().status);
+            setDescricao(snapshot.data().descricao);
+            let index = clientes.findIndex(item => item.id === snapshot.data().clienteId);
+            setClienteSelect(index);
+            index = assuntos.findIndex(item => item.id === snapshot.data().assuntoId);
+            setAssunto(index);
+            setIsUpdate(true);
+            console.log(index);
+        }).catch((err)=>{
+            toast.error('Erro ou tentar buscar o chamado pelo id');
+            console.log(err);
+            setIsUpdate(false);
+        });
     }
 
     function changeAssunto(e){

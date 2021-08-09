@@ -87,6 +87,24 @@ table td .badge{
     color: #fff;
 }
 
+.btn-more{
+    margin: 1.5em;
+    padding: .5em 1em;
+    height: 35px;
+    border: 0;
+    border-radius: 5px;
+    background-color: #181c2e;
+    color: #fff;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-more svg{
+    margin-left: .75em;
+}
+
 @media screen and (max-width: 600px){
     table{
         border: 0;
