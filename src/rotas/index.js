@@ -1,4 +1,4 @@
-import { Switch } from 'react-router-dom';
+import { Redirect, Switch } from 'react-router-dom';
 import Route from './Route';
 
 import Logar from '../paginas/Logar';
@@ -18,6 +18,8 @@ export default function Routes(){
             <Route exact path='/customers' component={Customers} isPrivate />
             <Route exact path='/new' component={New} isPrivate />
             <Route exact path='/new/:id' component={New} isPrivate />
+
+            <Route path="*" render={ () => <Redirect to="/" /> } />
         </Switch>
     );
 }
