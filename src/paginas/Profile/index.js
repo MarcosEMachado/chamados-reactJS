@@ -12,6 +12,7 @@ export default function Profile(){
     const { user, signOut, setUser, storageUser } = useContext(AuthContext);
 
     const [nome, setNome] = useState(user && user.nome);
+    // eslint-disable-next-line
     const [email, setEmail] = useState(user && user.email);
     const [avatarUrl, setAvatarUrl] = useState(user && user.avatarUrl);
     const [imgAvatar, setImgAvatar] = useState(null);
@@ -34,7 +35,7 @@ export default function Profile(){
 
     async function handleUpload(){
         const uid = user.uid;
-
+        // eslint-disable-next-line
         const uploadTask = await firebase.storage()
         .ref(`images/${uid}/${imgAvatar.name}`)
         .put(imgAvatar)

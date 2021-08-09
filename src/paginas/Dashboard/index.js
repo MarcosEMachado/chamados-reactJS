@@ -40,7 +40,7 @@ export default function Dashboard(){
 
         loadChamados();
 
-        //???para que isso
+        //quando ele distroi a tele o useEffect devolve esse retorno
         return ()=>{}
     },[]);
 
